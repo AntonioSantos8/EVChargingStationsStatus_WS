@@ -56,31 +56,30 @@ def parse(raw):
             continue
 
         connectors = []
-        for c in (item.get("connectors") or item.get("plugs") or []):
+        for c in (item.get("connectedPlugs") or []):
             if not isinstance(c, dict):
                 continue
-            power = c.get("power") or c.get("maxPower") or "N/A"
+            power = c.get("power", "N/A")
             connectors.append({
-                "tipo": str(c.get("type") or c.get("standard") or "N/A").upper(),
+                "tipo": c.get("name", "N/A"),
                 "potencia": f"{power} kW" if power != "N/A" else "N/A",
-                "status": get_status(str(c.get("status") or c.get("availability") or "")),
+                "status": get_status(c.get("stateName", "")),
             })
 
         if not connectors:
-            power = item.get("power") or "N/A"
             connectors = [{
                 "tipo": "N/A",
-                "potencia": f"{power} kW" if power != "N/A" else "N/A",
-                "status": get_status(str(item.get("status") or "")),
+                "potencia": "N/A",
+                "status": get_status(item.get("stateName", "")),
             }]
 
         result.append({
-            "nome": item.get("name") or item.get("title") or "N/A",
+            "nome": item.get("name", "N/A"),
             "endereco": item.get("address") or item.get("street") or "",
             "cidade": item.get("city") or item.get("cidade") or "",
             "estado": item.get("state") or item.get("uf") or "",
-            "lat": str(item.get("lat") or item.get("latitude") or ""),
-            "lng": str(item.get("lng") or item.get("longitude") or ""),
+            "lat": str(item.get("lat") or ""),
+            "lng": str(item.get("lng") or ""),
             "conectores": connectors,
             "coleta_timestamp": ts,
         })
@@ -90,11 +89,11 @@ def parse(raw):
 
 def get_status(text):
     t = text.lower()
-    if any(w in t for w in ["disponível", "livre", "available", "free", "idle", "true"]):
+    if "available" in t:
         return "Disponível"
-    if any(w in t for w in ["ocupado", "busy", "charging", "em uso", "in_use", "false"]):
+    if "charging" in t or "finishing" in t:
         return "Ocupado"
-    if any(w in t for w in ["offline", "inativo", "error", "erro", "falha"]):
+    if "unavailable" in t or "offline" in t or "error" in t or "fault" in t:
         return "Offline"
     return "Desconhecido"
 

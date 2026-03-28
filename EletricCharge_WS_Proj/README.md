@@ -1,4 +1,3 @@
-```markdown
 # 🔌 EV Scraper — Postos de Carregamento Elétrico
 
 Coleta automática de dados de postos de carregamento elétrico via TupiMob,
