@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EV Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:        #080c14;
+    --surface:   #0e1420;
+    --surface2:  #141c2e;
+    --border:    #1e2d45;
+    --accent:    #00d4ff;
+    --green:     #00e87a;
+    --red:       #ff4d6d;
+    --yellow:    #ffd93d;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --mono:      'Space Mono', monospace;
+    --sans:      'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 32px 24px;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  header h1 {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  header span {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* Painel de controles */
+  .controls {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    position: sticky;
+    top: 24px;
+  }
+
+  .controls h2 {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 24px;
+  }
+
+  .slider-group {
+    margin-bottom: 28px;
+  }
+
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+
+  .slider-label span {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .slider-value {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,212,255,0.5);
+    transition: box-shadow 0.2s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 18px rgba(0,212,255,0.8);
+  }
+
+  #slider-custo::-webkit-slider-thumb {
+    background: var(--red);
+    box-shadow: 0 0 10px rgba(255,77,109,0.5);
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metric-row:last-child { border-bottom: none; }
+
+  .metric-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .metric-val {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .val-green  { color: var(--green); }
+  .val-red    { color: var(--red); }
+  .val-yellow { color: var(--yellow); }
+  .val-blue   { color: var(--accent); }
+
+  .btn-run {
+    width: 100%;
+    margin-top: 24px;
+    padding: 14px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn-run:hover   { opacity: 0.85; }
+  .btn-run:active  { transform: scale(0.98); }
+  .btn-run:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-status {
+    margin-top: 10px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-align: center;
+    font-family: var(--mono);
+    min-height: 18px;
+  }
+
+  /* Painel direito */
+  .main-panel { display: flex; flex-direction: column; gap: 24px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-header h3 {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .card-header .badge {
+    font-size: 0.65rem;
+    font-family: var(--mono);
+    background: var(--surface2);
+    color: var(--muted);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* Tabela */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  thead tr {
+    background: var(--surface2);
+  }
+
+  th {
+    padding: 10px 16px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td { background: var(--surface2); }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: var(--mono);
+  }
+
+  .pill-green  { background: rgba(0,232,122,0.12); color: var(--green); }
+  .pill-red    { background: rgba(255,77,109,0.12); color: var(--red); }
+  .pill-yellow { background: rgba(255,217,61,0.12); color: var(--yellow); }
+
+  /* Gráfico inline */
+  .chart-area {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .bar-item { display: flex; flex-direction: column; gap: 6px; }
+
+  .bar-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+  }
+
+  .bar-name  { color: var(--text); max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-pct   { font-family: var(--mono); color: var(--accent); }
+
+  .bar-track {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), #6c63ff);
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* Análise IA */
+  .ai-output {
+    padding: 24px;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: #94a3b8;
+    white-space: pre-wrap;
+    font-family: var(--sans);
+    min-height: 80px;
+  }
+
+  .ai-output.loading {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
+
+  /* Imagens dos gráficos matplotlib */
+  .chart-img-wrap {
+    padding: 16px 24px 24px;
+  }
+
+  .chart-img-wrap img {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .img-placeholder {
+    width: 100%;
+    height: 200px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .controls { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>EV Charging Dashboard</h1>
+  <span id="last-update">—</span>
+</header>
+
+<div class="grid">
+
+  <!-- Controles -->
+  <div class="controls">
+    <h2>Simulação Financeira</h2>
+
+    <div class="slider-group">
+      <div class="slider-label">
+        <span>Preço cobrado / kWh</span>
+        <span class="slider-value" id="val-preco">R$ 2,00</span>
+      </div>
+      <input type="range" id="slider-preco" min="100" max="500" value="200" step="10">
+      <div style="display:flex;justify-content:space-between;margin-top:5px;">
+        <span style="font-size:0.65rem;color:var(--muted);font-family:var(--mono)">R$ 1,00</span>
+        <span style="font-size:0.65rem;color:var(--muted);font-family:var(--mono)">R$ 5,00</span>
+      </div>
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-label">
+        <span>Custo da energia / kWh</span>
+        <span class="slider-value" id="val-custo" style="color:var(--red)">R$ 0,80</span>
+      </div>
+      <input type="range" id="slider-custo" min="30" max="300" value="80" step="5">
+      <div style="display:flex;justify-content:space-between;margin-top:5px;">
+        <span style="font-size:0.65rem;color:var(--muted);font-family:var(--mono)">R$ 0,30</span>
+        <span style="font-size:0.65rem;color:var(--muted);font-family:var(--mono)">R$ 3,00</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="metric-row">
+      <span class="metric-label">Margem estimada</span>
+      <span class="metric-val val-green" id="margem">—</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Receita total (período)</span>
+      <span class="metric-val val-blue" id="receita-total">—</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Lucro total (período)</span>
+      <span class="metric-val val-green" id="lucro-total">—</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Postos analisados</span>
+      <span class="metric-val val-yellow" id="n-postos">—</span>
+    </div>
+
+    <button class="btn-run" id="btn-run" onclick="runAnalysis()">
+      Rodar análise completa
+    </button>
+    <div class="btn-status" id="btn-status"></div>
+  </div>
+
+  <!-- Painel principal -->
+  <div class="main-panel">
+
+    <!-- Ranking de utilização -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Utilização por Posto</h3>
+        <span class="badge" id="badge-periodo">—</span>
+      </div>
+      <div class="chart-area" id="uso-bars">
+        <div style="color:var(--muted);font-size:0.78rem;font-family:var(--mono);padding:8px 0">
+          carregue os dados pelo botão acima
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela financeira -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Levantamento Financeiro</h3>
+        <span class="badge">estimado</span>
+      </div>
+      <div class="table-wrap">
+        <table id="fin-table">
+          <thead>
+            <tr>
+              <th>Posto</th>
+              <th>Cidade</th>
+              <th>% Uso</th>
+              <th>Receita</th>
+              <th>Custo</th>
+              <th>Lucro</th>
+            </tr>
+          </thead>
+          <tbody id="fin-tbody">
+            <tr><td colspan="6" style="color:var(--muted);font-family:var(--mono);font-size:0.72rem">
+              aguardando análise...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Gráfico matplotlib utilização -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Gráfico — Utilização ao Longo do Tempo</h3>
+        <span class="badge">matplotlib</span>
+      </div>
+      <div class="chart-img-wrap">
+        <div class="img-placeholder" id="img-utilizacao">
+          gráfico gerado após análise
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico matplotlib financeiro -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Gráfico — Financeiro por Posto</h3>
+        <span class="badge">matplotlib</span>
+      </div>
+      <div class="chart-img-wrap">
+        <div class="img-placeholder" id="img-financeiro">
+          gráfico gerado após análise
+        </div>
+      </div>
+    </div>
+
+    <!-- Análise IA -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Análise por IA</h3>
+        <span class="badge">claude</span>
+      </div>
+      <div class="ai-output" id="ai-text">
+aguardando análise...
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Dados recebidos do Python via arquivo JSON ──
+// O analyzer.py salva output_analise/dashboard_data.json
+// Este HTML lê esse arquivo (deve ser aberto via servidor local ou file://)
+
+let dadosGlobais = null;
+
+const fmtBRL = v => "R$ " + v.toFixed(2).replace(".", ",");
+
+// Sliders
+const sliderPreco = document.getElementById("slider-preco");
+const sliderCusto = document.getElementById("slider-custo");
+
+sliderPreco.addEventListener("input", () => {
+  document.getElementById("val-preco").textContent = "R$ " + (sliderPreco.value / 100).toFixed(2).replace(".", ",");
+  if (dadosGlobais) recalculate();
+});
+
+sliderCusto.addEventListener("input", () => {
+  document.getElementById("val-custo").textContent = "R$ " + (sliderCusto.value / 100).toFixed(2).replace(".", ",");
+  if (dadosGlobais) recalculate();
+});
+
+function recalculate() {
+  const preco = sliderPreco.value / 100;
+  const custo = sliderCusto.value / 100;
+  const intervalo = 15;
+
+  const financials = dadosGlobais.postos.map(p => {
+    const energiaTotal = p.ocupado * p.power_avg_kw * (intervalo / 60);
+    const receita = energiaTotal * preco;
+    const custoVal = energiaTotal * custo;
+    return { ...p, receita, custo: custoVal, lucro: receita - custoVal };
+  }).sort((a, b) => b.lucro - a.lucro);
+
+  const margem = preco > 0 ? ((preco - custo) / preco * 100).toFixed(1) : 0;
+  const receitaTotal = financials.reduce((s, f) => s + f.receita, 0);
+  const lucroTotal   = financials.reduce((s, f) => s + f.lucro, 0);
+
+  document.getElementById("margem").textContent = margem + "%";
+  document.getElementById("margem").className = "metric-val " + (margem > 0 ? "val-green" : "val-red");
+  document.getElementById("receita-total").textContent = fmtBRL(receitaTotal);
+  document.getElementById("lucro-total").textContent   = fmtBRL(lucroTotal);
+  document.getElementById("lucro-total").className = "metric-val " + (lucroTotal >= 0 ? "val-green" : "val-red");
+  document.getElementById("n-postos").textContent  = financials.length;
+
+  renderBars(dadosGlobais.postos);
+  renderTable(financials);
+}
+
+function renderBars(postos) {
+  const sorted = [...postos].sort((a, b) => b.uso_pct - a.uso_pct);
+  const html = sorted.map(p => `
+    <div class="bar-item">
+      <div class="bar-meta">
+        <span class="bar-name">${p.nome}</span>
+        <span class="bar-pct">${p.uso_pct}%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${p.uso_pct}%"></div>
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("uso-bars").innerHTML = html;
+}
+
+function renderTable(financials) {
+  const rows = financials.map(f => {
+    const lucroClass = f.lucro >= 0 ? "pill-green" : "pill-red";
+    const usoClass   = f.uso_pct >= 60 ? "pill-yellow" : f.uso_pct >= 30 ? "pill-green" : "pill-red";
+    return `<tr>
+      <td>${f.nome}</td>
+      <td>${f.cidade}</td>
+      <td><span class="pill ${usoClass}">${f.uso_pct}%</span></td>
+      <td>${fmtBRL(f.receita)}</td>
+      <td>${fmtBRL(f.custo)}</td>
+      <td><span class="pill ${lucroClass}">${fmtBRL(f.lucro)}</span></td>
+    </tr>`;
+  }).join("");
+  document.getElementById("fin-tbody").innerHTML = rows;
+}
+
+function loadChartImages() {
+  // Tenta carregar imagens geradas pelo matplotlib
+  const imgU = document.getElementById("img-utilizacao");
+  const imgF = document.getElementById("img-financeiro");
+
+  const ts = new Date().getTime();
+
+  imgU.outerHTML = `<img src="output_analise/graficos/utilizacao_tempo.png?t=${ts}"
+    onerror="this.outerHTML='<div class=img-placeholder>imagem não encontrada — rode o analyzer.py</div>'"
+    style="width:100%;border-radius:8px;border:1px solid var(--border)" id="img-utilizacao">`;
+
+  imgF.outerHTML = `<img src="output_analise/graficos/financeiro.png?t=${ts}"
+    onerror="this.outerHTML='<div class=img-placeholder>imagem não encontrada — rode o analyzer.py</div>'"
+    style="width:100%;border-radius:8px;border:1px solid var(--border)" id="img-financeiro">`;
+}
+
+function loadAIText() {
+  fetch(`output_analise/analise_ia.txt?t=${Date.now()}`)
+    .then(r => r.text())
+    .then(txt => {
+      document.getElementById("ai-text").classList.remove("loading");
+      document.getElementById("ai-text").textContent = txt;
+    })
+    .catch(() => {
+      document.getElementById("ai-text").textContent = "arquivo analise_ia.txt não encontrado.\nRode o analyzer.py primeiro.";
+    });
+}
+
+async function runAnalysis() {
+  const btn = document.getElementById("btn-run");
+  const status = document.getElementById("btn-status");
+  const preco = (sliderPreco.value / 100).toFixed(2);
+  const custo = (sliderCusto.value / 100).toFixed(2);
+
+  btn.disabled = true;
+  status.textContent = "executando analyzer.py...";
+  document.getElementById("ai-text").className = "ai-output loading";
+  document.getElementById("ai-text").textContent = "gerando análise...";
+
+  // Chama o Python via fetch (requer servidor local com o run_server.py)
+  try {
+    const resp = await fetch(`http://localhost:8765/run?preco=${preco}&custo=${custo}`);
+    const data = await resp.json();
+
+    if (data.ok) {
+      status.textContent = "concluído — recarregando dados";
+      await loadDashboardData();
+      loadChartImages();
+      loadAIText();
+      status.textContent = "";
+    } else {
+      status.textContent = "erro: " + (data.error || "desconhecido");
+    }
+  } catch(e) {
+    // Fallback: mostra instruções manuais
+    status.textContent = "servidor local não encontrado";
+    document.getElementById("ai-text").className = "ai-output";
+    document.getElementById("ai-text").textContent =
+      `Para rodar sem servidor, execute no terminal:\n\npython analyzer.py\n\nDepois recarregue esta página.`;
+  }
+
+  btn.disabled = false;
+}
+
+async function loadDashboardData() {
+  try {
+    const resp = await fetch(`output_analise/dashboard_data.json?t=${Date.now()}`);
+    const data = await resp.json();
+    dadosGlobais = data;
+
+    document.getElementById("last-update").textContent =
+      "atualizado: " + (data.gerado_em || "—");
+    document.getElementById("badge-periodo").textContent =
+      data.periodo || "—";
+
+    recalculate();
+  } catch(e) {
+    // dados ainda não gerados
+  }
+}
+
+// Inicializa
+loadDashboardData();
+loadChartImages();
+loadAIText();
+</script>
+</body>
+</html>

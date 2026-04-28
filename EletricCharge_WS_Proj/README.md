@@ -1,121 +1,94 @@
-# 🔌 EV Scraper — Postos de Carregamento Elétrico
+# EV Scraper — Charging Station Data Collector
 
-Coleta automática de dados de postos de carregamento elétrico via TupiMob,
-com análise de utilização e rentabilidade em Excel.
-
----
-
-## 📁 Arquivos do projeto
-
-| Arquivo | Descrição |
-|---|---|
-| `scraper.py` | Script principal de coleta (roda a cada 15 min) |
-| `excel_manager.py` | Gerencia criação e atualização do Excel |
-| `demo_data.py` | Gera dados fictícios para testar o layout |
-| `requirements.txt` | Dependências Python |
-| `postos_carregamento.xlsx` | Arquivo de saída (criado automaticamente) |
+Automated data collector for EV charging stations using TupiMob's internal API. Runs on a 15-minute schedule, capturing connector type, power output, and real-time availability per station. Data is stored in a structured Excel file with utilization metrics, financial estimates, and an AI-generated analysis report.
 
 ---
 
-## ⚙️ Instalação
+## Installation
 
-### 1. Pré-requisitos
-- Python 3.10+
-- Google Chrome instalado
-- ChromeDriver compatível com sua versão do Chrome
+Python 3.10+ required.
 
-### 2. Instalar dependências
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. ChromeDriver (automático via webdriver-manager)
-O script usa `webdriver-manager` para baixar o ChromeDriver automaticamente.
-Se preferir manual: baixe em https://chromedriver.chromium.org e ajuste o
-caminho na função `build_driver()` em `scraper.py`.
-
 ---
 
-## 🚀 Como usar
+## Usage
 
-### Testar com dados fictícios (sem Chrome)
-```bash
-python demo_data.py
-```
-Gera o arquivo `postos_carregamento.xlsx` com 32 coletas simuladas.
-
-### Rodar o scraper real
+**Collect data** (runs every 15 minutes automatically):
 ```bash
 python scraper.py
 ```
-- Faz a primeira coleta imediatamente
-- Repete a cada 15 minutos automaticamente
-- Pressione `Ctrl+C` para encerrar
 
----
+**Open the analysis dashboard:**
+```bash
+python run_server.py
+```
 
-## ⚙️ Configurações em `scraper.py`
+Opens `http://localhost:8765/dashboard.html` in your browser automatically.
 
-```python
-TUPIMOB_URL = "https://www.tupimob.com.br/mapa"  # URL do mapa
-COLLECTION_INTERVAL_MINUTES = 15                 # intervalo de coleta
-EXCEL_FILE = "postos_carregamento.xlsx"          # nome do arquivo
-
-CENTER_LAT  = -26.9194   # latitude do centro (ex: Blumenau-SC)
-CENTER_LNG  = -49.0661   # longitude do centro
-RADIUS_KM   = 50         # raio de busca em km
+**Run analysis only** (without the dashboard server):
+```bash
+python analyzer.py
 ```
 
 ---
 
-## 📊 Estrutura do Excel
+## Configuration
 
-### Aba `Registros`
-Cada linha = 1 leitura de 1 conector em 1 posto:
+At the top of `scraper.py`:
 
-| Coluna | Descrição |
-|---|---|
-| Timestamp Coleta | Data/hora da coleta |
-| Nome do Posto | Nome no mapa |
-| Endereço | Rua/Avenida |
-| Cidade | Cidade |
-| Estado | UF |
-| Latitude / Longitude | Coordenadas GPS |
-| Tipo Conector | CCS2, CHAdeMO, Type2... |
-| Potência (kW) | Ex: 50 kW |
-| Status Conector | Disponível / Ocupado / Offline |
-
-### Aba `Postos`
-Resumo agregado por posto com % de utilização.
-
-### Aba `Análise`
-Ranking dos postos por utilização (top 20).
+```python
+SEARCH_CITY = "Blumenau"  # city to search
+INTERVAL    = 15          # collection interval in minutes
+EXCEL_FILE  = "charging_stations.xlsx"
+```
 
 ---
 
-## 🔧 Ajuste dos seletores CSS
+## AI Analysis Setup
 
-O TupiMob pode atualizar seu HTML. Se o scraper não encontrar dados:
+The analyzer calls the Anthropic API to generate a written analysis. To enable it, add your API key in `analyzer.py`:
 
-1. Abra o site no Chrome → F12 (DevTools)
-2. Clique em um posto no mapa
-3. Inspecione o popup/sidebar que aparece
-4. Copie os seletores CSS corretos
-5. Atualize a função `_parse_popup()` em `scraper.py`
+```python
+ANTHROPIC_API_KEY = "YOUR_API_KEY_HERE"
+```
 
----
-
-## 📈 Análise de Rentabilidade
-
-Com os dados coletados, é possível calcular:
-
-- **Taxa de utilização por posto** = leituras "Ocupado" / total de leituras
-- **Horário de pico** = filtrar por hora na aba Registros
-- **Postos mais rentáveis** = cruzar utilização × potência × preço por kWh
-- **Rentabilidade estimada** = utilização × potência × horas × tarifa
+Get a key at [console.anthropic.com](https://console.anthropic.com). Each analysis call costs roughly $0.003.
 
 ---
 
-## 📝 Logs
+## Output
 
-O script gera `scraper.log` com histórico completo das coletas.
+After running the dashboard, the following files are generated:
+
+```
+output/
+  charts/
+    utilization_over_time.png
+    financials.png
+  ai_analysis.txt
+  dashboard_data.json
+charging_stations.xlsx   ← Records / Stations / Analysis / Financial tabs
+```
+
+---
+
+## Financial Model
+
+Each "In Use" reading represents 15 minutes of active charging. Estimated values:
+
+- **Revenue** = power (kW) × (15 min / 60) × price per kWh
+- **Cost** = power (kW) × (15 min / 60) × energy cost per kWh
+- **Profit** = Revenue − Cost
+
+Price and cost per kWh are adjustable via sliders in the dashboard.
+
+---
+
+## Notes
+
+- The scraper uses TupiMob's internal API discovered via browser DevTools. If the API changes or requires authentication in the future, the request headers in `scraper.py` may need to be updated.
+- If the API returns an empty response, a `debug.json` file is saved automatically for inspection.
+- Logs are written to `scraper.log`.

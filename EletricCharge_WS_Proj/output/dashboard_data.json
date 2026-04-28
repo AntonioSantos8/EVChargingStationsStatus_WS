@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-04-28 19:31",
+  "period": "2026-04-28 19:30:52 → 2026-04-28 19:30:52",
+  "stations": [
+    {
+      "nome": "BYD | DVA - Blumenau - 01",
+      "cidade": "",
+      "uso_pct": 100.0,
+      "ocupado": 2,
+      "total": 2,
+      "power_avg": 60.0
+    },
+    {
+      "nome": "Shell Recharge | Posto Angeloni Blumenau",
+      "cidade": "",
+      "uso_pct": 50.0,
+      "ocupado": 1,
+      "total": 2,
+      "power_avg": 25.0
+    },
+    {
+      "nome": "Rede Cooper | Estação de Recarga Vorstadt",
+      "cidade": "",
+      "uso_pct": 50.0,
+      "ocupado": 1,
+      "total": 2,
+      "power_avg": 11.0
+    },
+    {
+      "nome": "Shell Recharge | Mercado Blumenau - SC",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "Shell Recharge | Mercado Blumenau - SC (AC)",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "BYD | DVA Blumenau - 03",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "ESTACAO ASPMB",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "Blumen Energia",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "Eletroposto Agama Bahia - Benjamin Constant",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "BYD | DVA - Joinville - 01",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 2,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "BYD | DVA - Joinville - 04",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "Domus Solar Show Room",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "VILLA PARK",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 2,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "Eletroposto Agama Vale Auto Shopping #1",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    },
+    {
+      "nome": "Eletroposto Agama Vale Auto Shopping #2",
+      "cidade": "",
+      "uso_pct": 0.0,
+      "ocupado": 0,
+      "total": 1,
+      "power_avg": 0.0
+    }
+  ]
+}

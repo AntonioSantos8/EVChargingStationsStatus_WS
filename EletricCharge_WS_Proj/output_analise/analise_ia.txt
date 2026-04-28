@@ -1,0 +1,36 @@
+ANÁLISE DE POSTOS DE CARREGAMENTO — 28/04/2026 19:17
+Preço cobrado: R$2.0/kWh | Custo energia: R$0.8/kWh
+============================================================
+
+[Sem resposta da IA]
+
+============================================================
+Dados resumidos usados na análise:
+
+Dados coletados: 40 leituras de 15 postos
+Período: 2026-04-28 19:13:52 até 2026-04-28 19:16:44
+Receita total estimada: R$ 112.00
+Lucro total estimado: R$ 67.20
+Preço cobrado: R$ 2.0/kWh | Custo energia: R$ 0.8/kWh
+
+Top 3 postos mais rentáveis:
+  - BYD | DVA - Blumenau - 01 (): 75.0% uso | receita R$90.00 | lucro R$54.00
+  - Rede Cooper | Estação de Recarga Vorstadt (): 50.0% uso | receita R$22.00 | lucro R$13.20
+  - Shell Recharge | Posto Angeloni Blumenau (): 0.0% uso | receita R$0.00 | lucro R$0.00
+
+Todos os postos:
+  BYD | DVA - Blumenau - 01: 75.0% uso | R$90.00 receita | R$54.00 lucro
+  Rede Cooper | Estação de Recarga Vorstadt: 50.0% uso | R$22.00 receita | R$13.20 lucro
+  Shell Recharge | Posto Angeloni Blumenau: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  Shell Recharge | Mercado Blumenau - SC: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  Shell Recharge | Mercado Blumenau - SC (AC): 0.0% uso | R$0.00 receita | R$0.00 lucro
+  BYD | DVA Blumenau - 03: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  ESTACAO ASPMB: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  Blumen Energia: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  Eletroposto Agama Bahia - Benjamin Constant: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  BYD | DVA - Joinville - 01: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  BYD | DVA - Joinville - 04: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  Domus Solar Show Room: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  VILLA PARK: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  Eletroposto Agama Vale Auto Shopping #1: 0.0% uso | R$0.00 receita | R$0.00 lucro
+  Eletroposto Agama Vale Auto Shopping #2: 0.0% uso | R$0.00 receita | R$0.00 lucro
